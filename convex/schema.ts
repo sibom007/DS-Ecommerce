@@ -19,7 +19,10 @@ export default defineSchema({
     ),
     createdAt: v.number(),
     imageUrl: v.optional(v.string()),
-  }).index("by_clerk_id", ["clerkUserId"]),
+  })
+    .index("by_clerk_id", ["clerkUserId"])
+    .index("by_email", ["email"])
+    .index("by_clerk_id_email", ["clerkUserId", "email"]),
 
   // ============================
   // CATEGORIES

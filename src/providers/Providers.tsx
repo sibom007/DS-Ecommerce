@@ -4,7 +4,6 @@ import { ThemeProvider } from "@/providers/theme-provider";
 
 import { ClerkProvider } from "@clerk/nextjs";
 import ConvexClientProvider from "./ConvexProviderWithClerk";
-import SyncUser from "@/feature/auth/components/sync-user";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -14,10 +13,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       enableSystem
       disableTransitionOnChange>
       <ClerkProvider>
-        <ConvexClientProvider>
-          <SyncUser />
-          {children}
-        </ConvexClientProvider>
+        <ConvexClientProvider>{children}</ConvexClientProvider>
       </ClerkProvider>
     </ThemeProvider>
   );

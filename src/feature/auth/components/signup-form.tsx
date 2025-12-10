@@ -32,6 +32,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 
 import { Separator } from "@/components/ui/separator";
 import { ApiError } from "../types";
+import { useMutation } from "convex/react";
+import { api } from "../../../../convex/_generated/api";
 
 // Zod schema for signup
 const SignUpSchema = z.object({
@@ -48,6 +50,7 @@ const VerifyEmailSchema = z.object({
 const SignUpForm = () => {
   const router = useRouter();
   const { signUp, isLoaded, setActive } = useSignUp();
+  const createUser = useMutation(api.auth.createUserIfNotExists);
 
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
@@ -111,6 +114,11 @@ const SignUpForm = () => {
 
       if (attempt.status === "complete") {
         await setActive({ session: attempt.createdSessionId });
+        await createUser({
+          userId: attempt.createdUserId!, // correct
+          email: signUp.emailAddress ?? "", // safe source
+          username: signUp.username ?? "",
+        });
         router.push("/");
       }
     } catch (err: unknown) {
