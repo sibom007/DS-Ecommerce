@@ -39,10 +39,32 @@ export const getLoggedInUser = query({
     // Clerk user id
     const clerkUserId = identity.subject;
 
-    // Direct indexed lookup (fastest possible in Convex)
-    return ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkUserId", clerkUserId))
-      .unique();
+    const email = identity.email;
+    if (email) {
+      // Direct indexed lookup (fastest possible in Convex)
+      return ctx.db
+        .query("users")
+        .withIndex("by_clerk_id_email", (q) =>
+          q.eq("clerkUserId", clerkUserId).eq("email", email)
+        )
+        .unique();
+    }
   },
 });
+
+export const getUserRole = query({
+  args: { clerkId: v.string() },
+  handler: async ({ db }, { clerkId }) => {
+    const user = await db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkUserId", clerkId))
+      .unique();
+
+    return user?.role ?? null;
+  },
+});
+
+
+
+
+

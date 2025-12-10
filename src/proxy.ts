@@ -1,5 +1,9 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { fetchQuery } from "convex/nextjs";
+import { api } from "../convex/_generated/api";
+import { roleRequiredRoutes } from "./feature/auth/constant";
+import { urlMatch } from "./feature/auth/lib/urlMatch";
 
 const isProtectedRoute = createRouteMatcher([
   "/dashboard(.*)",
@@ -12,18 +16,33 @@ const isPublicRoute = createRouteMatcher(["/sign-in", "/sign-up"]);
 export default clerkMiddleware(async (auth, req) => {
   const { userId, redirectToSignIn } = await auth();
 
-  // Public routes — redirect authenticated users
+  // PUBLIC ROUTES — logged-in users should not see sign-in/sign-up
   if (isPublicRoute(req)) {
-    if (userId) {
-      return NextResponse.redirect(new URL("/", req.url));
-    }
+    if (userId) return NextResponse.redirect(new URL("/", req.url));
     return NextResponse.next();
   }
 
-  // Protected routes — require authentication
-  if (isProtectedRoute(req)) {
-    if (!userId) {
-      return redirectToSignIn({ returnBackUrl: req.url });
+  // AUTH-PROTECTED ROUTES
+  if (isProtectedRoute(req) && !userId) {
+    return redirectToSignIn({ returnBackUrl: req.url });
+  }
+
+  // ROLE PROTECTION
+  if (userId) {
+    // get role from Convex
+    const UserRole = await fetchQuery(api.auth.getUserRole, {
+      clerkId: userId,
+    });
+
+    // check if this route requires a specific role
+    for (const role of roleRequiredRoutes) {
+      if (urlMatch(req, role.matcher)) {
+        if (UserRole !== role.requiredRole) {
+          return NextResponse.redirect(
+            new URL(`/dashboard/${UserRole}`, req.url)
+          );
+        }
+      }
     }
   }
 

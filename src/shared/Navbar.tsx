@@ -24,8 +24,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+
 export function Navbar() {
-  const { isAuthenticated, isLoading } = useAuth();
+
+  const { isAuthenticated, isLoading, user } = useAuth();
   const { openUserProfile } = useClerk();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -138,7 +140,7 @@ export function Navbar() {
                     {/* Dashboard */}
                     <DropdownMenuItem className="flex gap-2 cursor-pointer">
                       <LayoutDashboardIcon className="w-4 h-4" />
-                      <Link href={"/dashboard"}>Dashboard</Link>
+                      <Link href={`/dashboard/${user?.role}`}>Dashboard</Link>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
