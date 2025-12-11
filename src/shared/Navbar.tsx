@@ -24,24 +24,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-
 export function Navbar() {
-
   const { isAuthenticated, isLoading, user } = useAuth();
   const { openUserProfile } = useClerk();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const MotionLink = motion(Link);
-
-  const linkVariants = {
-    hidden: { opacity: 0, y: -10 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: { delay: i * 0.08 },
-    }),
-    hover: { scale: 1.1, x: 4 },
-  };
 
   return (
     <nav className="border-b border-border sticky top-0 z-40 backdrop-blur-xl bg-background/70">
@@ -246,3 +234,13 @@ export function Navbar() {
     </nav>
   );
 }
+
+export const linkVariants = {
+  hidden: { opacity: 0, y: -10 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.08 },
+  }),
+  hover: { scale: 1.1, x: 4 },
+};
