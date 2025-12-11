@@ -1,20 +1,12 @@
-import { auth } from "@clerk/nextjs/server";
-import { api } from "../../../../../convex/_generated/api";
-import { fetchQuery } from "convex/nextjs";
-import { redirect } from "next/navigation";
 import { ROLES } from "@/feature/auth/constant";
+import { requireRole } from "@/feature/auth/lib/requireRole";
 
 const Page = async () => {
-  const { userId } = await auth();
-  if (!userId) {
-    return redirect("/");
-  }
-  const role = await fetchQuery(api.auth.getUserRole, { clerkId: userId });
-  if (role !== ROLES.ADMIN) redirect(`/dashboard/${role}`);
+  await requireRole(ROLES.ADMIN);
 
   return (
     <div>
-      <h1>admin</h1>
+      <h1>Admin Dahboard</h1>
     </div>
   );
 };
